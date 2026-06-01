@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>Review Sách - Thư Viện HBC</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet"/>
+<style>
+  :root {
+    --primary:#1a56db; --primary-light:#e8f0fe;
+    --gray-50:#f9fafb; --gray-100:#f3f4f6; --gray-200:#e5e7eb;
+    --gray-500:#6b7280; --gray-700:#374151; --gray-900:#111827;
+    --radius:12px;
+  }
+  * { box-sizing:border-box; }
+  body { background:var(--gray-50); font-family:'Segoe UI',system-ui,sans-serif; color:var(--gray-900); padding-bottom:80px; }
+  .page-wrap { max-width:600px; margin:0 auto; }
+
+  /* TOPBAR */
+  .topbar { background:#fff; border-bottom:1px solid var(--gray-200); padding:14px 16px; position:sticky; top:0; z-index:100; }
+  .topbar-title { font-size:18px; font-weight:700; color:var(--gray-900); }
+
+  /* REVIEW LIST */
+  .review-list { padding:12px 12px 0; }
+  .review-card { background:#fff; border:1px solid var(--gray-200); border-radius:var(--radius); margin-bottom:12px; overflow:hidden; cursor:pointer; transition:transform .15s; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+  .review-card:active { transform:scale(.98); }
+  .review-card-header { padding:14px 14px 0; }
+  .review-book-badge { font-size:11px; font-weight:600; color:var(--primary); background:var(--primary-light); padding:3px 10px; border-radius:20px; display:inline-block; margin-bottom:8px; }
+  .review-card-title { font-size:15px; font-weight:700; line-height:1.35; margin-bottom:4px; color:var(--gray-900); }
+  .review-card-excerpt { font-size:13px; color:var(--gray-500); line-height:1.6; padding:0 14px; margin-bottom:10px; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+  .review-card-footer { border-top:1px solid var(--gray-100); padding:8px 14px; display:flex; justify-content:space-between; align-items:center; }
+  .review-author { font-size:12px; color:var(--gray-500); }
+  .review-date { font-size:12px; color:var(--gray-500); }
+  .read-more { font-size:12px; color:var(--primary); font-weight:600; }
+
+  /* SKELETON */
+  .skeleton { background:linear-gradient(90deg,var(--gray-100) 25%,var(--gray-200) 50%,var(--gray-100) 75%); background-size:200% 100%; animation:shimmer 1.2s infinite; border-radius:6px; }
+  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+  /* BOTTOM NAV */
+  .bottom-nav { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid var(--gray-200); display:flex; z-index:200; padding:6px 0 10px; max-width:600px; margin:0 auto; }
+  .nav-item { flex:1; display:flex; flex-direction:column; align-items:center; gap:2px; font-size:11px; color:var(--gray-500); text-decoration:none; padding:4px 0; }
+  .nav-item i { font-size:22px; }
+  .nav-item.active { color:var(--primary); }
+
+  /* MODAL DETAIL */
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:500; display:flex; align-items:flex-end; justify-content:center; }
+  .modal-sheet { background:#fff; border-radius:20px 20px 0 0; padding:20px 20px 32px; width:100%; max-width:600px; animation:slideUp .25s ease; max-height:90vh; overflow-y:auto; }
+  @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+  .modal-handle { width:40px; height:4px; background:var(--gray-200); border-radius:2px; margin:0 auto 16px; }
+  .review-full-title { font-size:18px; font-weight:700; line-height:1.4; margin-bottom:6px; }
+  .review-full-body { font-size:14px; color:var(--gray-700); line-height:1.75; white-space:pre-wrap; margin:12px 0; }
+  .book-tag { display:inline-flex; align-items:center; gap:6px; background:var(--primary-light); color:var(--primary); border-radius:8px; padding:6px 12px; font-size:13px; font-weight:600; margin-bottom:12px; }
+  .btn-cancel { width:100%; background:transparent; color:var(--gray-500); border:1px solid var(--gray-200); border-radius:10px; padding:11px; font-size:14px; cursor:pointer; margin-top:12px; }
+
+  .empty-state { text-align:center; padding:60px 20px; color:var(--gray-500); }
+  .empty-state i { font-size:48px; opacity:.3; display:block; margin-bottom:12px; }
+</style>
+</head>
+<body>
+
+<div class="page-wrap">
+  <div class="topbar">
+    <div class="topbar-title">📝 Reviews từ độc giả</div>
+  </div>
+  <div class="review-list" id="reviewList"></div>
+</div>
+
+<nav class="bottom-nav">
+  <a class="nav-item" href="index.html"><i class="bi bi-books"></i><span>Sách</span></a>
+  <a class="nav-item active" href="review.html"><i class="bi bi-star"></i><span>Review</span></a>
+  <a class="nav-item" href="admin.html"><i class="bi bi-gear"></i><span>Cài đặt</span></a>
+</nav>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalReview" style="display:none" onclick="if(event.target===this)document.getElementById('modalReview').style.display='none'">
+  <div class="modal-sheet" id="modalReviewContent"></div>
+</div>
+
+<script>
+var API_URL = 'https://script.google.com/macros/s/AKfycbzS84k6tXSESeSb5x1vmh1IkEbbupuFlJ7NYVyq4eLDKRePrTI7Q1vhQalayQUgepsQ/exec';
+
+async function loadReviews() {
+  document.getElementById('reviewList').innerHTML = [1,2,3].map(function(){
+    return '<div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:14px;margin-bottom:12px">'
+      +'<div class="skeleton" style="height:22px;width:60%;margin-bottom:10px"></div>'
+      +'<div class="skeleton" style="height:13px;width:90%;margin-bottom:6px"></div>'
+      +'<div class="skeleton" style="height:13px;width:75%"></div></div>';
+  }).join('');
+
+  try {
+    var res = await fetch(API_URL + '?action=getReviews');
+    var json = await res.json();
+    if (!json.success || json.data.length === 0) {
+      document.getElementById('reviewList').innerHTML = '<div class="empty-state"><i class="bi bi-journal-text"></i><p>Chưa có review nào.<br>Hãy là người đầu tiên chia sẻ!</p></div>';
+      return;
+    }
+    var html = '';
+    json.data.forEach(function(r) {
+      var excerpt = r.noiDung.length > 120 ? r.noiDung.substring(0,120) + '...' : r.noiDung;
+      html += '<div class="review-card" onclick="openReview(' + JSON.stringify(r).split('"').join('&quot;') + ')">'
+        + '<div class="review-card-header">'
+        + '<span class="review-book-badge">📚 ' + escHtml(r.tenSach) + '</span>'
+        + '<div class="review-card-title">' + escHtml(r.tieuDe) + '</div>'
+        + '</div>'
+        + '<div class="review-card-excerpt">' + escHtml(excerpt) + '</div>'
+        + '<div class="review-card-footer">'
+        + '<span class="review-author">✍️ ' + escHtml(r.nguoiViet) + '</span>'
+        + '<span class="review-date">' + r.ngayDang + '</span>'
+        + '</div></div>';
+    });
+    document.getElementById('reviewList').innerHTML = html;
+  } catch(e) {
+    document.getElementById('reviewList').innerHTML = '<div class="empty-state"><i class="bi bi-wifi-off"></i><p>Không tải được dữ liệu.</p></div>';
+  }
+}
+
+function openReview(r) {
+  document.getElementById('modalReviewContent').innerHTML =
+    '<div class="modal-handle"></div>'
+    + '<span class="book-tag">📚 ' + escHtml(r.tenSach) + '</span>'
+    + '<div class="review-full-title">' + escHtml(r.tieuDe) + '</div>'
+    + '<div style="font-size:12px;color:var(--gray-500);margin-bottom:4px">✍️ ' + escHtml(r.nguoiViet) + ' · ' + r.ngayDang + '</div>'
+    + '<hr style="border-color:var(--gray-100);margin:12px 0"/>'
+    + '<div class="review-full-body">' + escHtml(r.noiDung) + '</div>'
+    + '<button class="btn-cancel" onclick="document.getElementById(\'modalReview\').style.display=\'none\'">Đóng</button>';
+  document.getElementById('modalReview').style.display = 'flex';
+}
+
+function escHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+loadReviews();
+</script>
+</body>
+</html>

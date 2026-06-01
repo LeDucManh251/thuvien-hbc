@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>Thư Viện HBC</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet"/>
+<style>
+  :root {
+    --primary: #1a56db;
+    --primary-light: #e8f0fe;
+    --success: #057a55;
+    --success-light: #def7ec;
+    --danger: #c81e1e;
+    --danger-light: #fde8e8;
+    --warning-light: #fef3c7;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-500: #6b7280;
+    --gray-700: #374151;
+    --gray-900: #111827;
+    --radius: 12px;
+    --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--gray-50); font-family: 'Segoe UI', system-ui, sans-serif; color: var(--gray-900); padding-bottom: 80px; }
+
+  /* SEARCH */
+  .search-wrap { background: #fff; padding: 12px 16px 0; border-bottom: 1px solid var(--gray-200); position: sticky; top: 0; z-index: 100; }
+  .search-box { display: flex; gap: 8px; margin-bottom: 10px; }
+  .search-input { flex: 1; border: 1.5px solid var(--gray-200); border-radius: 10px; padding: 9px 14px; font-size: 14px; outline: none; transition: border .2s; }
+  .search-input:focus { border-color: var(--primary); }
+  .pills-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
+  .pills-row::-webkit-scrollbar { display: none; }
+  .pill { flex-shrink: 0; font-size: 12px; font-weight: 500; padding: 5px 14px; border-radius: 20px; border: 1.5px solid var(--gray-200); background: #fff; color: var(--gray-700); cursor: pointer; transition: all .15s; white-space: nowrap; }
+  .pill.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+  .pill-muon.active { background: #b45309; border-color: #b45309; color: #fff; }
+
+  /* BOOK COUNT */
+  .book-count { padding: 10px 16px 4px; font-size: 12px; color: var(--gray-500); font-weight: 500; }
+
+  /* BOOK CARD */
+  .book-card { background: #fff; border-radius: var(--radius); border: 1px solid var(--gray-200); padding: 14px; display: flex; gap: 12px; margin: 0 12px 10px; box-shadow: var(--shadow); transition: transform .15s; }
+  .book-card:active { transform: scale(.98); }
+  .book-cover { width: 58px; height: 80px; border-radius: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+  .cover-colors { background: linear-gradient(135deg, #dbeafe, #bfdbfe); }
+  .cover-colors:nth-child(2) { background: linear-gradient(135deg, #d1fae5, #a7f3d0); }
+  .book-info { flex: 1; min-width: 0; }
+  .book-title { font-size: 14px; font-weight: 600; line-height: 1.35; margin-bottom: 2px; color: var(--gray-900); }
+  .book-author { font-size: 12px; color: var(--gray-500); margin-bottom: 7px; }
+  .badge-status { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; display: inline-block; }
+  .badge-san-sang { background: var(--success-light); color: var(--success); }
+  .badge-dang-muon { background: var(--danger-light); color: var(--danger); }
+  .badge-genre { font-size: 11px; padding: 3px 9px; border-radius: 20px; background: var(--gray-100); color: var(--gray-500); display: inline-block; margin-left: 4px; }
+  .btn-borrow { margin-top: 8px; background: var(--primary); color: #fff; border: none; border-radius: 8px; padding: 7px 16px; font-size: 12px; font-weight: 600; cursor: pointer; transition: background .15s; }
+  .btn-borrow:hover { background: #1648c8; }
+  .btn-return { margin-top: 8px; background: var(--success); color: #fff; border: none; border-radius: 8px; padding: 7px 16px; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .btn-waitlist { margin-top: 8px; background: var(--gray-100); color: var(--gray-700); border: 1px solid var(--gray-200); border-radius: 8px; padding: 7px 16px; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .btn-detail { margin-top: 8px; margin-left: 6px; background: transparent; color: var(--primary); border: 1.5px solid var(--primary); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
+
+  /* SKELETON */
+  .skeleton { background: linear-gradient(90deg, var(--gray-100) 25%, var(--gray-200) 50%, var(--gray-100) 75%); background-size: 200% 100%; animation: shimmer 1.2s infinite; border-radius: 6px; }
+  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+  .sk-card { background:#fff; border-radius:var(--radius); border:1px solid var(--gray-200); padding:14px; display:flex; gap:12px; margin:0 12px 10px; }
+  .sk-cover { width:58px; height:80px; border-radius:8px; flex-shrink:0; }
+  .sk-line { height:13px; margin-bottom:8px; }
+
+  /* BOTTOM NAV */
+  .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid var(--gray-200); display: flex; z-index: 200; padding: 6px 0 10px; max-width: 600px; margin: 0 auto; }
+  .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; color: var(--gray-500); text-decoration: none; padding: 4px 0; transition: color .15s; }
+  .nav-item i { font-size: 22px; }
+  .nav-item.active { color: var(--primary); }
+
+  /* MODAL */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 500; display: flex; align-items: flex-end; justify-content: center; }
+  .modal-sheet { background: #fff; border-radius: 20px 20px 0 0; padding: 20px 20px 32px; width: 100%; max-width: 600px; animation: slideUp .25s ease; max-height: 85vh; overflow-y: auto; }
+  @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+  .modal-handle { width: 40px; height: 4px; background: var(--gray-200); border-radius: 2px; margin: 0 auto 16px; }
+  .modal-title { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+  .modal-subtitle { font-size: 13px; color: var(--gray-500); margin-bottom: 16px; }
+  .form-label-sm { font-size: 13px; font-weight: 600; color: var(--gray-700); margin-bottom: 5px; display: block; }
+  .form-input { width: 100%; border: 1.5px solid var(--gray-200); border-radius: 10px; padding: 10px 14px; font-size: 14px; outline: none; transition: border .2s; margin-bottom: 12px; }
+  .form-input:focus { border-color: var(--primary); }
+  .btn-submit { width: 100%; background: var(--primary); color: #fff; border: none; border-radius: 10px; padding: 13px; font-size: 15px; font-weight: 700; cursor: pointer; transition: background .15s; }
+  .btn-submit:hover { background: #1648c8; }
+  .btn-submit:disabled { background: var(--gray-200); color: var(--gray-500); cursor: not-allowed; }
+  .btn-cancel { width: 100%; background: transparent; color: var(--gray-500); border: 1px solid var(--gray-200); border-radius: 10px; padding: 11px; font-size: 14px; cursor: pointer; margin-top: 8px; }
+  .alert-box { border-radius: 10px; padding: 12px 14px; font-size: 13px; margin-bottom: 12px; }
+  .alert-success { background: var(--success-light); color: var(--success); }
+  .alert-error { background: var(--danger-light); color: var(--danger); }
+  .alert-info { background: var(--primary-light); color: var(--primary); }
+
+  /* DETAIL MODAL */
+  .detail-cover { width: 80px; height: 110px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 36px; margin-right: 16px; flex-shrink: 0; }
+  .moTa-text { font-size: 13px; color: var(--gray-700); line-height: 1.6; background: var(--gray-50); border-radius: 10px; padding: 12px; margin: 10px 0; }
+  .review-card { border: 1px solid var(--gray-200); border-radius: 10px; padding: 12px; margin-top: 10px; }
+  .review-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .review-body { font-size: 13px; color: var(--gray-700); line-height: 1.65; white-space: pre-wrap; }
+  .review-meta { font-size: 11px; color: var(--gray-500); margin-top: 6px; }
+
+  /* TOAST */
+  .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--gray-900); color: #fff; border-radius: 10px; padding: 10px 20px; font-size: 13px; font-weight: 500; z-index: 9999; opacity: 0; transition: opacity .3s; pointer-events: none; white-space: nowrap; }
+  .toast.show { opacity: 1; }
+
+  /* EMPTY */
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--gray-500); }
+  .empty-state i { font-size: 48px; opacity: .3; display: block; margin-bottom: 12px; }
+
+  /* MAX WIDTH */
+  .page-wrap { max-width: 600px; margin: 0 auto; }
+</style>
+</head>
+<body>
+
+<!-- SEARCH + FILTERS -->
+<div class="search-wrap page-wrap">
+  <div class="search-box">
+    <input class="search-input" id="searchInput" type="search" placeholder="Tìm tên sách, tác giả..." oninput="onSearch()"/>
+  </div>
+  <div class="pills-row" id="pillsRow">
+    <span class="pill active" data-val="Tất cả" onclick="selectPill(this)">Tất cả</span>
+    <span class="pill" data-val="Hướng dẫn/Kỹ năng" onclick="selectPill(this)">Kỹ năng</span>
+    <span class="pill" data-val="Kinh tế/Quản trị" onclick="selectPill(this)">Kinh tế</span>
+    <span class="pill" data-val="Tâm lý học" onclick="selectPill(this)">Tâm lý</span>
+    <span class="pill" data-val="Cuộc sống" onclick="selectPill(this)">Cuộc sống</span>
+    <span class="pill" data-val="Tiểu thuyết" onclick="selectPill(this)">Tiểu thuyết</span>
+    <span class="pill pill-muon" data-val="__dangmuon__" onclick="selectPill(this)">Đang mượn</span>
+  </div>
+</div>
+
+<!-- BOOK LIST -->
+<div class="page-wrap">
+  <div class="book-count" id="bookCount"></div>
+  <div id="bookList"></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <a class="nav-item active" href="index.html"><i class="bi bi-books"></i><span>Sách</span></a>
+  <a class="nav-item" href="review.html"><i class="bi bi-star"></i><span>Review</span></a>
+  <a class="nav-item" href="admin.html"><i class="bi bi-gear"></i><span>Cài đặt</span></a>
+</nav>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- MODAL MƯỢN SÁCH -->
+<div class="modal-overlay" id="modalBorrow" style="display:none" onclick="if(event.target===this)closeModal('modalBorrow')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="borrowBookTitle"></div>
+    <div class="modal-subtitle">Nhập thông tin để xác nhận mượn sách</div>
+    <div id="borrowAlert"></div>
+    <label class="form-label-sm">Họ và tên *</label>
+    <input class="form-input" id="borrowHoTen" placeholder="Nguyễn Văn A" type="text"/>
+    <label class="form-label-sm">Mã nhân viên *</label>
+    <input class="form-input" id="borrowMaNV" placeholder="NV001" type="text"/>
+    <button class="btn-submit" id="btnConfirmBorrow" onclick="confirmBorrow()">Xác nhận mượn sách</button>
+    <button class="btn-cancel" onclick="closeModal('modalBorrow')">Huỷ</button>
+  </div>
+</div>
+
+<!-- MODAL TRẢ SÁCH -->
+<div class="modal-overlay" id="modalReturn" style="display:none" onclick="if(event.target===this)closeModal('modalReturn')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Trả sách</div>
+    <div class="modal-subtitle" id="returnBookTitle"></div>
+    <div id="returnAlert"></div>
+    <label class="form-label-sm">Họ và tên *</label>
+    <input class="form-input" id="returnHoTen" placeholder="Nguyễn Văn A" type="text"/>
+    <label class="form-label-sm">Mã nhân viên *</label>
+    <input class="form-input" id="returnMaNV" placeholder="NV001" type="text"/>
+    <button class="btn-submit" id="btnConfirmReturn" onclick="confirmReturn()">Xác nhận trả sách</button>
+    <button class="btn-cancel" onclick="closeModal('modalReturn')">Huỷ</button>
+  </div>
+</div>
+
+<!-- MODAL CHI TIẾT SÁCH -->
+<div class="modal-overlay" id="modalDetail" style="display:none" onclick="if(event.target===this)closeModal('modalDetail')">
+  <div class="modal-sheet" id="modalDetailContent"></div>
+</div>
+
+<script>
+// ---- CẤU HÌNH ----
+var API_URL = 'https://script.google.com/macros/s/AKfycbzS84k6tXSESeSb5x1vmh1IkEbbupuFlJ7NYVyq4eLDKRePrTI7Q1vhQalayQUgepsQ/exec'; // Thay bằng URL sau khi deploy
+
+// ---- STATE ----
+var allBooks = [];
+var filteredBooks = [];
+var currentPill = 'Tất cả';
+var searchQuery = '';
+var currentBorrowBook = null;
+var currentReturnBook = null;
+
+var COVER_ICONS = ['📚','📖','📕','📗','📘','📙','🔖','📝'];
+var COVER_BGSOLD = ['#dbeafe','#d1fae5','#fce7f3','#fef3c7','#ede9fe','#fee2e2','#e0f2fe','#dcfce7'];
+
+function coverBg(idx) {
+  var bgs = ['#dbeafe','#d1fae5','#fce7f3','#fef3c7','#ede9fe','#fee2e2','#e0f2fe','#dcfce7'];
+  return bgs[idx % bgs.length];
+}
+function coverIcon(idx) {
+  var icons = ['📚','📖','📕','📗','📘','📙','🔖','📝'];
+  return icons[idx % icons.length];
+}
+
+// ---- LOAD SÁCH ----
+async function loadBooks() {
+  showSkeleton();
+  try {
+    var res = await fetch(API_URL + '?action=getBooks');
+    var json = await res.json();
+    if (json.success) {
+      allBooks = json.data;
+      renderBooks();
+    } else { showError(); }
+  } catch(e) { showError(); }
+}
+
+function showSkeleton() {
+  var html = '';
+  for (var i = 0; i < 5; i++) {
+    html += '<div class="sk-card"><div class="sk-cover skeleton"></div><div style="flex:1"><div class="sk-line skeleton" style="width:70%"></div><div class="sk-line skeleton" style="width:45%"></div><div class="sk-line skeleton" style="width:55%;margin-top:16px"></div></div></div>';
+  }
+  document.getElementById('bookList').innerHTML = html;
+}
+
+function showError() {
+  document.getElementById('bookList').innerHTML = '<div class="empty-state"><i class="bi bi-wifi-off"></i><p>Không tải được dữ liệu.<br>Kiểm tra kết nối và thử lại.</p></div>';
+}
+
+function renderBooks() {
+  var books = allBooks.filter(function(b) {
+    var matchPill = currentPill === 'Tất cả' ? true
+      : currentPill === '__dangmuon__' ? b.trangThai === 'Đang mượn'
+      : b.theLoai === currentPill;
+    var matchSearch = searchQuery === '' ? true
+      : b.tenSach.toLowerCase().indexOf(searchQuery) >= 0
+      || b.tacGia.toLowerCase().indexOf(searchQuery) >= 0;
+    return matchPill && matchSearch;
+  });
+  filteredBooks = books;
+  document.getElementById('bookCount').textContent = books.length + ' cuốn sách';
+
+  if (books.length === 0) {
+    document.getElementById('bookList').innerHTML = '<div class="empty-state"><i class="bi bi-search"></i><p>Không tìm thấy sách nào.</p></div>';
+    return;
+  }
+
+  var html = '';
+  books.forEach(function(b, idx) {
+    var isSan = b.trangThai === 'Sẵn sàng';
+    var badgeClass = isSan ? 'badge-san-sang' : 'badge-dang-muon';
+    var badgeText = isSan ? '● Sẵn sàng' : '● Đang mượn';
+    var coverStyle = 'background:' + coverBg(idx) + ';';
+    var icon = b.anhBia ? '' : coverIcon(idx);
+    var coverHtml = b.anhBia
+      ? '<img src="' + b.anhBia + '" style="width:58px;height:80px;object-fit:cover;border-radius:8px;flex-shrink:0"/>'
+      : '<div class="book-cover" style="' + coverStyle + '">' + icon + '</div>';
+    var actionBtn = isSan
+      ? '<button class="btn-borrow" onclick="openBorrow(' + JSON.stringify(b).split('"').join('&quot;') + ')">Mượn sách</button>'
+      : '<button class="btn-waitlist" onclick="openReturn(' + JSON.stringify(b).split('"').join('&quot;') + ')">Trả sách</button>';
+    html += '<div class="book-card">'
+      + coverHtml
+      + '<div class="book-info">'
+      + '<div class="book-title">' + escHtml(b.tenSach) + '</div>'
+      + '<div class="book-author">' + escHtml(b.tacGia) + '</div>'
+      + '<span class="badge-status ' + badgeClass + '">' + badgeText + '</span>'
+      + '<span class="badge-genre">' + escHtml(b.theLoai) + '</span><br/>'
+      + actionBtn
+      + '<button class="btn-detail" onclick="openDetail(\'' + b.maSach + '\')">Chi tiết</button>'
+      + '</div></div>';
+  });
+  document.getElementById('bookList').innerHTML = html;
+}
+
+// ---- FILTER ----
+function selectPill(el) {
+  document.querySelectorAll('.pill').forEach(function(p){ p.classList.remove('active'); });
+  el.classList.add('active');
+  currentPill = el.dataset.val;
+  renderBooks();
+}
+function onSearch() {
+  searchQuery = document.getElementById('searchInput').value.toLowerCase().trim();
+  renderBooks();
+}
+
+// ---- MODAL MƯỢN ----
+function openBorrow(book) {
+  currentBorrowBook = book;
+  document.getElementById('borrowBookTitle').textContent = book.tenSach;
+  document.getElementById('borrowHoTen').value = '';
+  document.getElementById('borrowMaNV').value = '';
+  document.getElementById('borrowAlert').innerHTML = '';
+  document.getElementById('btnConfirmBorrow').disabled = false;
+  document.getElementById('btnConfirmBorrow').textContent = 'Xác nhận mượn sách';
+  document.getElementById('modalBorrow').style.display = 'flex';
+}
+
+async function confirmBorrow() {
+  var hoTen = document.getElementById('borrowHoTen').value.trim();
+  var maNV = document.getElementById('borrowMaNV').value.trim();
+  if (!hoTen || !maNV) {
+    setAlert('borrowAlert', 'error', 'Vui lòng nhập đầy đủ Họ tên và Mã nhân viên.');
+    return;
+  }
+  var btn = document.getElementById('btnConfirmBorrow');
+  btn.disabled = true; btn.textContent = 'Đang xử lý...';
+
+  try {
+    var res = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'borrowBook', maNhanVien: maNV, hoTen: hoTen, maSach: currentBorrowBook.maSach, tenSach: currentBorrowBook.tenSach })
+    });
+    var json = await res.json();
+    if (json.success) {
+      setAlert('borrowAlert', 'success', '✓ ' + json.message + ' (Ngày mượn: ' + json.ngayMuon + ')');
+      // Cap nhat trang thai local
+      allBooks.forEach(function(b){ if(b.maSach===currentBorrowBook.maSach) b.trangThai='Đang mượn'; });
+      renderBooks();
+      setTimeout(function(){ closeModal('modalBorrow'); }, 2000);
+    } else {
+      setAlert('borrowAlert', 'error', json.error);
+      btn.disabled = false; btn.textContent = 'Xác nhận mượn sách';
+    }
+  } catch(e) {
+    setAlert('borrowAlert', 'error', 'Lỗi kết nối. Vui lòng thử lại.');
+    btn.disabled = false; btn.textContent = 'Xác nhận mượn sách';
+  }
+}
+
+// ---- MODAL TRẢ ----
+function openReturn(book) {
+  currentReturnBook = book;
+  document.getElementById('returnBookTitle').textContent = 'Trả: ' + book.tenSach;
+  document.getElementById('returnHoTen').value = '';
+  document.getElementById('returnMaNV').value = '';
+  document.getElementById('returnAlert').innerHTML = '';
+  document.getElementById('btnConfirmReturn').disabled = false;
+  document.getElementById('btnConfirmReturn').textContent = 'Xác nhận trả sách';
+  document.getElementById('modalReturn').style.display = 'flex';
+}
+
+async function confirmReturn() {
+  var hoTen = document.getElementById('returnHoTen').value.trim();
+  var maNV = document.getElementById('returnMaNV').value.trim();
+  if (!hoTen || !maNV) {
+    setAlert('returnAlert', 'error', 'Vui lòng nhập đầy đủ thông tin.');
+    return;
+  }
+  var btn = document.getElementById('btnConfirmReturn');
+  btn.disabled = true; btn.textContent = 'Đang xử lý...';
+  try {
+    var res = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'returnBook', maNhanVien: maNV, hoTen: hoTen, maSach: currentReturnBook.maSach })
+    });
+    var json = await res.json();
+    if (json.success) {
+      setAlert('returnAlert', 'success', '✓ ' + json.message);
+      setTimeout(function(){ closeModal('modalReturn'); }, 2500);
+    } else {
+      setAlert('returnAlert', 'error', json.error);
+      btn.disabled = false; btn.textContent = 'Xác nhận trả sách';
+    }
+  } catch(e) {
+    setAlert('returnAlert', 'error', 'Lỗi kết nối.');
+    btn.disabled = false; btn.textContent = 'Xác nhận trả sách';
+  }
+}
+
+// ---- MODAL CHI TIẾT ----
+async function openDetail(maSach) {
+  document.getElementById('modalDetailContent').innerHTML = '<div class="modal-handle"></div><div style="text-align:center;padding:40px"><div class="spinner-border text-primary" role="status"></div></div>';
+  document.getElementById('modalDetail').style.display = 'flex';
+  try {
+    var [bookRes, reviewRes] = await Promise.all([
+      fetch(API_URL + '?action=getBook&id=' + maSach),
+      fetch(API_URL + '?action=getReviews&bookId=' + maSach)
+    ]);
+    var bookJson = await bookRes.json();
+    var reviewJson = await reviewRes.json();
+    var b = bookJson.data;
+    var reviews = reviewJson.data || [];
+    var isSan = b.trangThai === 'Sẵn sàng';
+    var bookIdx = allBooks.findIndex(function(x){ return x.maSach === maSach; });
+    var icon = b.anhBia ? '' : coverIcon(bookIdx >= 0 ? bookIdx : 0);
+    var coverHtml = b.anhBia
+      ? '<img src="' + b.anhBia + '" style="width:80px;height:110px;object-fit:cover;border-radius:10px;flex-shrink:0;margin-right:16px"/>'
+      : '<div class="detail-cover" style="background:' + coverBg(bookIdx>=0?bookIdx:0) + '">' + icon + '</div>';
+    var reviewsHtml = reviews.length === 0
+      ? '<p style="color:var(--gray-500);font-size:13px;text-align:center;padding:16px 0">Chưa có review nào.</p>'
+      : reviews.map(function(r){
+          return '<div class="review-card"><div class="review-title">' + escHtml(r.tieuDe) + '</div>'
+            + '<div class="review-body">' + escHtml(r.noiDung) + '</div>'
+            + '<div class="review-meta">✍️ ' + escHtml(r.nguoiViet) + ' · ' + r.ngayDang + '</div></div>';
+        }).join('');
+    var actionBtn = isSan
+      ? '<button class="btn-borrow" style="width:100%;margin-top:12px" onclick="closeModal(\'modalDetail\');openBorrow(' + JSON.stringify(b).split('"').join('&quot;') + ')">📚 Mượn sách này</button>'
+      : '<button class="btn-waitlist" style="width:100%;margin-top:12px" onclick="closeModal(\'modalDetail\');openReturn(' + JSON.stringify(b).split('"').join('&quot;') + ')">↩ Trả sách này</button>';
+    document.getElementById('modalDetailContent').innerHTML =
+      '<div class="modal-handle"></div>'
+      + '<div style="display:flex;align-items:flex-start;margin-bottom:12px">'
+      + coverHtml
+      + '<div><div style="font-size:17px;font-weight:700;line-height:1.3">' + escHtml(b.tenSach) + '</div>'
+      + '<div style="font-size:13px;color:var(--gray-500);margin:4px 0">' + escHtml(b.tacGia) + '</div>'
+      + '<span class="badge-status ' + (isSan?'badge-san-sang':'badge-dang-muon') + '">' + (isSan?'● Sẵn sàng':'● Đang mượn') + '</span>'
+      + '<span class="badge-genre">' + escHtml(b.theLoai) + '</span></div></div>'
+      + '<div class="moTa-text">' + escHtml(b.moTa) + '</div>'
+      + actionBtn
+      + '<div style="font-size:14px;font-weight:700;margin:16px 0 4px">📝 Reviews từ người đọc</div>'
+      + reviewsHtml
+      + '<button class="btn-cancel" onclick="closeModal(\'modalDetail\')" style="margin-top:16px">Đóng</button>';
+  } catch(e) {
+    document.getElementById('modalDetailContent').innerHTML = '<div class="modal-handle"></div><p style="padding:20px;text-align:center;color:var(--danger)">Lỗi tải dữ liệu.</p><button class="btn-cancel" onclick="closeModal(\'modalDetail\')">Đóng</button>';
+  }
+}
+
+// ---- HELPERS ----
+function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+function setAlert(id, type, msg) {
+  var cls = type === 'success' ? 'alert-success' : type === 'info' ? 'alert-info' : 'alert-error';
+  document.getElementById(id).innerHTML = '<div class="alert-box ' + cls + '">' + msg + '</div>';
+}
+function escHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2500);
+}
+
+// ---- INIT ----
+loadBooks();
+</script>
+</body>
+</html>
