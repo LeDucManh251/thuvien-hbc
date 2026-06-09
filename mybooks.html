@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>Tủ Sách Của Tôi</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<style>
+  :root {
+    --primary:#1a56db; --primary-light:#e8f0fe;
+    --success:#057a55; --success-light:#def7ec;
+    --danger:#c81e1e; --danger-light:#fde8e8;
+    --warning:#92400e; --warning-light:#fef3c7;
+    --orange:#c05621; --orange-light:#fff3e0;
+    --gray-50:#f9fafb; --gray-100:#f3f4f6; --gray-200:#e5e7eb;
+    --gray-500:#6b7280; --gray-700:#374151; --gray-900:#111827;
+    --radius:12px;
+  }
+  * { box-sizing:border-box; }
+  body { background:var(--gray-50); font-family:'Segoe UI',system-ui,sans-serif; padding-bottom:80px; }
+  .page-wrap { max-width:600px; margin:0 auto; }
+
+  /* TOPBAR */
+  .topbar { background:#fff; border-bottom:1px solid var(--gray-200); padding:14px 16px; display:flex; align-items:center; gap:10px; position:sticky; top:0; z-index:100; }
+  .btn-back { background:none; border:none; padding:0; cursor:pointer; color:var(--gray-500); display:flex; align-items:center; }
+  .topbar-title { font-size:16px; font-weight:700; }
+
+  /* LOGIN FORM */
+  .login-wrap { padding:20px 16px; }
+  .login-card { background:#fff; border:1px solid var(--gray-200); border-radius:var(--radius); padding:20px; }
+  .login-title { font-size:15px; font-weight:700; margin-bottom:4px; }
+  .login-sub { font-size:13px; color:var(--gray-500); margin-bottom:16px; }
+  .form-label-sm { font-size:13px; font-weight:600; color:var(--gray-700); margin-bottom:5px; display:block; }
+  .form-input { width:100%; border:1.5px solid var(--gray-200); border-radius:10px; padding:10px 14px; font-size:14px; outline:none; transition:border .2s; margin-bottom:12px; }
+  .form-input:focus { border-color:var(--primary); }
+  .btn-submit { width:100%; background:var(--primary); color:#fff; border:none; border-radius:10px; padding:12px; font-size:14px; font-weight:700; cursor:pointer; }
+  .alert-box { border-radius:10px; padding:10px 14px; font-size:13px; margin-bottom:12px; }
+  .alert-error { background:var(--danger-light); color:var(--danger); }
+
+  /* PROFILE HEADER */
+  .profile-header { background:#fff; border-bottom:1px solid var(--gray-200); padding:16px; display:flex; align-items:center; gap:14px; }
+  .profile-avatar { width:48px; height:48px; border-radius:50%; background:var(--primary-light); display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+  .profile-name { font-size:16px; font-weight:700; }
+  .profile-sub { font-size:12px; color:var(--gray-500); }
+  .btn-logout-sm { margin-left:auto; background:none; border:1px solid var(--gray-200); border-radius:8px; padding:6px 12px; font-size:12px; color:var(--gray-500); cursor:pointer; }
+
+  /* STATS */
+  .stats-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; padding:12px 12px 0; }
+  .stat-card { background:#fff; border:1px solid var(--gray-200); border-radius:var(--radius); padding:12px; text-align:center; }
+  .stat-value { font-size:22px; font-weight:700; }
+  .stat-label { font-size:11px; color:var(--gray-500); margin-top:2px; }
+
+  /* SECTION */
+  .section-title { font-size:13px; font-weight:700; color:var(--gray-700); padding:14px 16px 8px; text-transform:uppercase; letter-spacing:.3px; }
+
+  /* BOOK ITEM */
+  .book-item { background:#fff; border:1px solid var(--gray-200); border-radius:var(--radius); margin:0 12px 10px; padding:14px; box-shadow:0 1px 3px rgba(0,0,0,.05); }
+  .book-item-title { font-size:14px; font-weight:600; margin-bottom:3px; }
+  .book-item-sub { font-size:12px; color:var(--gray-500); margin-bottom:10px; }
+
+  /* HAN TRA BADGE */
+  .han-tra-row { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:6px; }
+  .han-tra-badge { font-size:12px; font-weight:600; padding:4px 10px; border-radius:20px; }
+  .han-binh-thuong { background:var(--success-light); color:var(--success); }
+  .han-sap-han { background:var(--orange-light); color:var(--orange); }
+  .han-qua-han { background:var(--danger-light); color:var(--danger); }
+  .han-cho-xn { background:var(--primary-light); color:var(--primary); }
+
+  /* COUNTDOWN */
+  .countdown { font-size:13px; color:var(--gray-500); }
+  .countdown.sap-han { color:var(--orange); font-weight:600; }
+  .countdown.qua-han { color:var(--danger); font-weight:700; }
+
+  /* HISTORY ITEM */
+  .history-item { background:#fff; border:1px solid var(--gray-200); border-radius:var(--radius); margin:0 12px 8px; padding:12px; }
+  .history-title { font-size:13px; font-weight:600; margin-bottom:2px; }
+  .history-meta { font-size:12px; color:var(--gray-500); }
+  .badge-da-tra { font-size:11px; padding:2px 8px; border-radius:20px; background:var(--gray-100); color:var(--gray-500); }
+
+  /* EMPTY */
+  .empty-state { text-align:center; padding:32px 20px; color:var(--gray-500); font-size:13px; }
+
+  /* BOTTOM NAV */
+  .bottom-nav { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid var(--gray-200); display:flex; z-index:200; padding:6px 0 10px; max-width:600px; margin:0 auto; }
+  .nav-item { flex:1; display:flex; flex-direction:column; align-items:center; gap:2px; font-size:11px; color:var(--gray-500); text-decoration:none; padding:4px 0; }
+  .nav-item svg { width:22px; height:22px; }
+  .nav-item.active { color:var(--primary); }
+</style>
+</head>
+<body>
+
+<div class="page-wrap">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <a href="index.html" class="btn-back">
+      <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+    </a>
+    <div class="topbar-title">📚 Tủ sách của tôi</div>
+  </div>
+
+  <!-- LOGIN FORM -->
+  <div id="loginSection">
+    <div class="login-wrap">
+      <div class="login-card">
+        <div class="login-title">Xem tủ sách cá nhân</div>
+        <div class="login-sub">Nhập thông tin để xem sách đang mượn và lịch sử</div>
+        <div id="loginAlert"></div>
+        <label class="form-label-sm">Họ và tên *</label>
+        <input class="form-input" id="inputHoTen" placeholder="Nguyễn Văn A" type="text"/>
+        <label class="form-label-sm">Mã nhân viên *</label>
+        <input class="form-input" id="inputMaNV" placeholder="NV001" type="text" onkeydown="if(event.key==='Enter')doLookup()"/>
+        <button class="btn-submit" id="btnLookup" onclick="doLookup()">Xem tủ sách</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MY BOOKS PANEL -->
+  <div id="mybooksSection" style="display:none">
+    <div class="profile-header">
+      <div class="profile-avatar">👤</div>
+      <div>
+        <div class="profile-name" id="profileName"></div>
+        <div class="profile-sub" id="profileMaNV"></div>
+      </div>
+      <button class="btn-logout-sm" onclick="doLogout()">Đổi NV</button>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-value" id="statDangMuon" style="color:var(--primary)">0</div>
+        <div class="stat-label">Đang mượn</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statQuaHan" style="color:var(--danger)">0</div>
+        <div class="stat-label">Quá hạn</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statTongDoc" style="color:var(--success)">0</div>
+        <div class="stat-label">Đã đọc</div>
+      </div>
+    </div>
+
+    <!-- DANG MUON -->
+    <div class="section-title">📖 Đang mượn</div>
+    <div id="dangMuonList"></div>
+
+    <!-- LICH SU -->
+    <div class="section-title">🕐 Lịch sử mượn</div>
+    <div id="lichSuList"></div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <a class="nav-item" href="index.html">
+    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+    <span>Sách</span>
+  </a>
+  <a class="nav-item" href="review.html">
+    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    <span>Review</span>
+  </a>
+  <a class="nav-item active" href="mybooks.html">
+    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span>Sách của tôi</span>
+  </a>
+  <a class="nav-item" href="admin.html">
+    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    <span>Cài đặt</span>
+  </a>
+</nav>
+
+<script>
+var API_URL = 'YOUR_APPS_SCRIPT_URL';
+var currentUser = null;
+
+async function doLookup() {
+  var hoTen = document.getElementById('inputHoTen').value.trim();
+  var maNV = document.getElementById('inputMaNV').value.trim();
+  if (!hoTen || !maNV) {
+    document.getElementById('loginAlert').innerHTML = '<div class="alert-box alert-error">Vui lòng nhập đầy đủ thông tin.</div>';
+    return;
+  }
+  var btn = document.getElementById('btnLookup');
+  btn.disabled = true; btn.textContent = 'Đang tải...';
+  try {
+    var res = await fetch(API_URL + '?action=getMyBooks&maNhanVien=' + encodeURIComponent(maNV) + '&hoTen=' + encodeURIComponent(hoTen));
+    var json = await res.json();
+    if (!json.success) {
+      document.getElementById('loginAlert').innerHTML = '<div class="alert-box alert-error">' + json.error + '</div>';
+      btn.disabled = false; btn.textContent = 'Xem tủ sách';
+      return;
+    }
+    currentUser = { hoTen: hoTen, maNV: maNV };
+    renderMyBooks(json);
+    document.getElementById('loginSection').style.display = 'none';
+    document.getElementById('mybooksSection').style.display = 'block';
+  } catch(e) {
+    document.getElementById('loginAlert').innerHTML = '<div class="alert-box alert-error">Lỗi kết nối. Thử lại.</div>';
+  }
+  btn.disabled = false; btn.textContent = 'Xem tủ sách';
+}
+
+function renderMyBooks(data) {
+  document.getElementById('profileName').textContent = currentUser.hoTen;
+  document.getElementById('profileMaNV').textContent = 'Mã NV: ' + currentUser.maNV;
+
+  var quaHan = (data.dangMuon || []).filter(function(b){ return b.tinhTrang === 'qua-han'; }).length;
+  document.getElementById('statDangMuon').textContent = (data.dangMuon || []).length;
+  document.getElementById('statQuaHan').textContent = quaHan;
+  document.getElementById('statTongDoc').textContent = (data.lichSu || []).length;
+
+  // Dang muon
+  var dm = data.dangMuon || [];
+  if (dm.length === 0) {
+    document.getElementById('dangMuonList').innerHTML = '<div class="empty-state">Bạn chưa mượn cuốn nào.</div>';
+  } else {
+    document.getElementById('dangMuonList').innerHTML = dm.map(function(b) {
+      var badgeClass, badgeText, countdownClass = '', countdownText = '';
+      if (b.trangThai === 'Chờ xác nhận') {
+        badgeClass = 'han-cho-xn'; badgeText = '⏳ Chờ xác nhận';
+      } else if (b.tinhTrang === 'qua-han') {
+        badgeClass = 'han-qua-han'; badgeText = '⚠️ Quá hạn';
+        countdownClass = 'qua-han';
+        countdownText = 'Quá hạn ' + Math.abs(b.soNgayConLai) + ' ngày!';
+      } else if (b.tinhTrang === 'sap-han') {
+        badgeClass = 'han-sap-han'; badgeText = '⏰ Sắp hết hạn';
+        countdownClass = 'sap-han';
+        countdownText = 'Còn ' + b.soNgayConLai + ' ngày';
+      } else {
+        badgeClass = 'han-binh-thuong'; badgeText = '✓ Đang mượn';
+        countdownText = 'Còn ' + b.soNgayConLai + ' ngày';
+      }
+      return '<div class="book-item">'
+        + '<div class="book-item-title">' + escHtml(b.tenSach) + '</div>'
+        + '<div class="book-item-sub">Mượn: ' + b.ngayMuon + ' · Hạn trả: ' + b.hanTra + '</div>'
+        + '<div class="han-tra-row">'
+        + '<span class="han-tra-badge ' + badgeClass + '">' + badgeText + '</span>'
+        + (countdownText ? '<span class="countdown ' + countdownClass + '">' + countdownText + '</span>' : '')
+        + '</div></div>';
+    }).join('');
+  }
+
+  // Lich su
+  var ls = data.lichSu || [];
+  if (ls.length === 0) {
+    document.getElementById('lichSuList').innerHTML = '<div class="empty-state">Chưa có lịch sử mượn trả.</div>';
+  } else {
+    document.getElementById('lichSuList').innerHTML = ls.map(function(b) {
+      return '<div class="history-item">'
+        + '<div style="display:flex;justify-content:space-between;align-items:flex-start">'
+        + '<div class="history-title">' + escHtml(b.tenSach) + '</div>'
+        + '<span class="badge-da-tra">Đã trả</span></div>'
+        + '<div class="history-meta">Mượn: ' + b.ngayMuon + (b.ngayTra ? ' · Trả: ' + b.ngayTra : '') + '</div>'
+        + '</div>';
+    }).join('');
+  }
+}
+
+function doLogout() {
+  currentUser = null;
+  document.getElementById('mybooksSection').style.display = 'none';
+  document.getElementById('loginSection').style.display = 'block';
+  document.getElementById('inputHoTen').value = '';
+  document.getElementById('inputMaNV').value = '';
+  document.getElementById('loginAlert').innerHTML = '';
+}
+
+function escHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
+</body>
+</html>
