@@ -75,6 +75,10 @@
   .nav-item.active { color:var(--primary); }
 
   .empty-state { text-align:center; padding:32px 20px; color:var(--gray-500); font-size:13px; }
+  .han-qua-han { background:var(--danger-light); color:var(--danger); font-size:11px; font-weight:600; padding:2px 8px; border-radius:20px; }
+  .han-sap-han { background:#fff3e0; color:#c05621; font-size:11px; font-weight:600; padding:2px 8px; border-radius:20px; }
+  .han-ok { background:var(--success-light); color:var(--success); font-size:11px; font-weight:600; padding:2px 8px; border-radius:20px; }
+  .orange-light { --warning-light:#fff3e0; }
   .empty-state i { font-size:36px; opacity:.3; display:block; margin-bottom:8px; }
 </style>
 </head>
@@ -83,10 +87,6 @@
 <!-- LOGIN -->
 <div class="login-wrap" id="loginWrap">
   <div class="login-card">
-    <a href="index.html" style="display:inline-flex;align-items:center;gap:4px;color:#6b7280;font-size:13px;text-decoration:none;margin-bottom:16px;">
-  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
-  Quay lại
-</a>
     <div class="login-logo">🛠️</div>
     <div class="login-title">Trang Quản trị</div>
     <div class="login-sub">Dành cho Hành chính / Ban quản lý</div>
@@ -106,7 +106,7 @@
     </div>
 
     <!-- STATS -->
-    <div class="stats-row">
+    <div class="stats-row" style="grid-template-columns:1fr 1fr 1fr">
       <div class="stat-card">
         <div class="stat-label">Đang mượn</div>
         <div class="stat-value" id="statBorrowing">—</div>
@@ -114,6 +114,10 @@
       <div class="stat-card">
         <div class="stat-label">Chờ xác nhận</div>
         <div class="stat-value" id="statWaiting">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label" style="color:var(--danger)">Quá hạn</div>
+        <div class="stat-value" id="statOverdue" style="color:var(--danger)">—</div>
       </div>
     </div>
 
@@ -141,22 +145,13 @@
 </div>
 
 <nav class="bottom-nav" id="bottomNav" style="display:none">
-  <a class="nav-item" href="index.html">
-    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-    <span>Sách</span>
-  </a>
-  <a class="nav-item" href="review.html">
-    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-    <span>Review</span>
-  </a>
-  <a class="nav-item active" href="admin.html">
-    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-    <span>Cài đặt</span>
-  </a>
+  <a class="nav-item" href="index.html"><i class="bi bi-books"></i><span>Sách</span></a>
+  <a class="nav-item" href="review.html"><i class="bi bi-star"></i><span>Review</span></a>
+  <a class="nav-item active" href="admin.html"><i class="bi bi-gear"></i><span>Cài đặt</span></a>
 </nav>
 
 <script>
-var API_URL = 'https://script.google.com/macros/s/AKfycbzS84k6tXSESeSb5x1vmh1IkEbbupuFlJ7NYVyq4eLDKRePrTI7Q1vhQalayQUgepsQ/exec';
+var API_URL = 'https://script.google.com/macros/s/AKfycbzTjXPH_ZlYG4vDu7Og17Ylsb64O0mAgEJpR-NZ86C2UYbg8R5c9lxbjcxVYL5zbfxI/exec';
 var adminPass = '';
 var borrowedData = [];
 var allBooks = [];
@@ -194,25 +189,34 @@ async function loadBorrowList() {
     borrowedData = json.data;
     var borrowing = json.data.filter(function(x){ return x.trangThai === 'Đang mượn'; });
     var waiting = json.data.filter(function(x){ return x.trangThai === 'Chờ xác nhận'; });
+    var overdue = json.data.filter(function(x){ return x.tinhTrang === 'qua-han'; });
     document.getElementById('statBorrowing').textContent = borrowing.length;
     document.getElementById('statWaiting').textContent = waiting.length;
+    document.getElementById('statOverdue').textContent = overdue.length;
     if (json.data.length === 0) {
-      document.getElementById('borrowList').innerHTML = '<div class="empty-state"><i class="bi bi-check-circle"></i>Không có sách nào đang mượn.</div>';
+      document.getElementById('borrowList').innerHTML = '<div class="empty-state">Không có sách nào đang mượn.</div>';
       return;
     }
-    // Sort: cho xac nhan len truoc
-    var sorted = waiting.concat(borrowing);
-    var html = sorted.map(function(item) {
+    var html = json.data.map(function(item) {
       var isWaiting = item.trangThai === 'Chờ xác nhận';
       var pillClass = isWaiting ? 'status-waiting' : 'status-borrowing';
       var confirmBtn = isWaiting
         ? '<button class="btn-confirm" onclick="confirmReturn(\'' + item.idGiaoDich + '\')">✓ Xác nhận đã trả</button>'
         : '';
+      var hanBadge = '';
+      if (item.tinhTrang === 'qua-han') {
+        hanBadge = ' <span class="han-qua-han">⚠️ Quá hạn ' + Math.abs(item.soNgayConLai) + ' ngày</span>';
+      } else if (item.tinhTrang === 'sap-han') {
+        hanBadge = ' <span class="han-sap-han">⏰ Còn ' + item.soNgayConLai + ' ngày</span>';
+      } else if (item.soNgayConLai !== null) {
+        hanBadge = ' <span class="han-ok">Còn ' + item.soNgayConLai + ' ngày</span>';
+      }
       return '<div class="borrow-row" id="row-' + item.idGiaoDich + '">'
         + '<div class="borrow-info">'
         + '<div class="borrow-book">' + escHtml(item.tenSach) + '</div>'
         + '<div class="borrow-person">' + escHtml(item.hoTen) + ' · ' + escHtml(item.maNhanVien) + '</div>'
-        + '<div class="borrow-date">Mượn: ' + item.ngayMuon + (item.ngayTra ? ' · Trả: ' + item.ngayTra : '') + '</div>'
+        + '<div class="borrow-date">Mượn: ' + item.ngayMuon + ' · Hạn: ' + item.hanTra + hanBadge + '</div>'
+        + (item.ngayTra ? '<div class="borrow-date">Ngày trả: ' + item.ngayTra + '</div>' : '')
         + confirmBtn
         + '</div>'
         + '<span class="status-pill ' + pillClass + '">' + item.trangThai + '</span>'
